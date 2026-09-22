@@ -7,7 +7,12 @@ def main():
         command = input()
         if command == "exit":
             break
-        print(f"{command}: command not found")
+        elif command.startswith("echo"):
+            inp = command.split()
+            print(" ".join(inp[1:]))
+            # print("\n")
+        else:
+            print(f"{command}: command not found")
     
 
 
