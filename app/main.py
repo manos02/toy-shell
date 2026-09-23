@@ -17,8 +17,12 @@ def main():
         if command == "exit":
             break
         elif command.startswith("echo"):
-            content = split_input_parts(command, take_from=1) # get everything after the "echo"
-            print(" ".join(content))
+            content_list = split_input_parts(command, index=1, range=True) # get everything after the "echo"
+            # TODO: implement custom parse
+            content_list = list(map(lambda x: x.strip("'"), content_list))
+            print("list", content_list)
+            content_str = " ".join(content_list)
+            print(content_str)
         elif command.startswith("type"):
             command_type = split_input_parts(command, index=1)
             if command_type in builtin_commands:
@@ -61,12 +65,16 @@ def is_executable(command_type, path_dirs):
 def pwd():
     return os.getcwd()
 
-def split_input_parts(inp:str, index=None, take_from=None):
+def split_input_parts(inp:str, index=None, range=False):
     inp = inp.split()
+    inp_len = len(inp)
     if index:
-        return inp[index]
-    if take_from:
-        return inp[take_from:]
+        if index > inp_len:
+            raise IndexError(f"Index: {index} is greater than {inp_len}")
+        if range:
+            return inp[index:]
+        else:
+            return inp[index]
     return inp
 if __name__ == "__main__":
     main()
