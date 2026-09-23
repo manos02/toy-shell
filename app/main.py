@@ -4,7 +4,7 @@ import os
 import subprocess
 
 def main():
-    builtin_commands = ["type", "echo", "exit"]
+    builtin_commands = ["type", "echo", "exit", "pwd"]
     path_var = os.getenv('PATH') # get the PATH env variable
 
     path_dirs = path_var.split(os.pathsep)
