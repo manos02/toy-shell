@@ -21,15 +21,15 @@ def main():
             if command_type in builtin_commands:
                 print(f"{command_type} is a shell builtin")
             else:
-                if dir := is_executable(command_type, path_dirs):
-                    print(f"{command_type} is {dir}/{command_type}")
+                if path := is_executable(command_type, path_dirs):
+                    print(f"{command_type} is {path}/{command_type}")
                 else:
                     print(f"{command_type} not found")
             continue
         elif command.startswith("custom_exe"):
             command_list = command.split()
             program_name = command_list[0]
-            if dir := is_executable(program_name, path_dirs):
+            if path := is_executable(program_name, path_dirs):
                 out = subprocess.call(command_list)
                 if out != 0: # return code
                     print(out)
@@ -38,9 +38,9 @@ def main():
             print(f"{command}: command not found")
 
 def is_executable(command_type, path_dirs):
-    for dir in path_dirs:
-        if shutil.which(command_type, path=dir):
-            return dir
+    for path in path_dirs:
+        if shutil.which(command_type, path=path):
+            return path
     return False
 
 if __name__ == "__main__":
