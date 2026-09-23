@@ -5,7 +5,10 @@ import subprocess
 
 def main():
     builtin_commands = ["type", "echo", "exit", "pwd"]
-    path_var = os.getenv('PATH') # get the PATH env variable
+
+    # ENVIRONMENT VARIABLES
+    path_var = os.getenv('PATH')
+    home_path = os.getenv('HOME')
 
     path_dirs = path_var.split(os.pathsep)
     while True:
@@ -38,7 +41,10 @@ def main():
             print(pwd())
         elif command.startswith("cd"):
             path = split_input_parts(command, index=1)
-            path = os.path.join(pwd(), path)
+            if path == "~": # handle home path
+                path = home_path
+            else:
+                path = os.path.join(pwd(), path)
             try:
                 os.chdir(path)
             except FileNotFoundError:
