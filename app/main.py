@@ -39,7 +39,10 @@ def main():
             print(current_directory)
         elif command.startswith("cd"):
             path = command.split()[1]
-            os.chdir(path)
+            try:
+                os.chdir(path)
+            except FileNotFoundError:
+                print(f"cd: {path}: No such file or directory")
         else:
             print(f"{command}: command not found")
 
