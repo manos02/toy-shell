@@ -34,6 +34,9 @@ def main():
                 if out != 0: # return code
                     print(out)
                 continue
+        elif command == "pwd":
+            current_directory = os.getcwd()
+            print(current_directory)
         else:
             print(f"{command}: command not found")
 
