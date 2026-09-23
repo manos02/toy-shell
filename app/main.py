@@ -14,10 +14,10 @@ def main():
         if command == "exit":
             break
         elif command.startswith("echo"):
-            content = command.split()[1:] # get everything after the "echo"
+            content = split_input_parts(command, take_from=1) # get everything after the "echo"
             print(" ".join(content))
         elif command.startswith("type"):
-            command_type = command.split()[1] 
+            command_type = split_input_parts(command, index=1)
             if command_type in builtin_commands:
                 print(f"{command_type} is a shell builtin")
             else:
@@ -27,20 +27,18 @@ def main():
                     print(f"{command_type} not found")
             continue
         elif command.startswith("custom_exe"):
-            command_list = command.split()
+            command_list = split_input_parts(command)
             program_name = command_list[0]
             if path := is_executable(program_name, path_dirs):
                 out = subprocess.call(command_list)
-                if out != 0: # return code
+                if out != 0: # success return code, do not output
                     print(out)
                 continue
         elif command == "pwd":
-            current_directory = os.getcwd()
-            print(current_directory)
+            print(pwd())
         elif command.startswith("cd"):
-            path = command.split()[1]
-            current_directory = os.getcwd()
-            path = os.path.join(current_directory, path)
+            path = split_input_parts(command, index=1)
+            path = os.path.join(pwd(), path)
             try:
                 os.chdir(path)
             except FileNotFoundError:
@@ -54,5 +52,15 @@ def is_executable(command_type, path_dirs):
             return path
     return False
 
+def pwd():
+    return os.getcwd()
+
+def split_input_parts(inp:str, index=None, take_from=None):
+    inp = inp.split()
+    if index:
+        return inp[index]
+    if take_from:
+        return inp[take_from:]
+    return inp
 if __name__ == "__main__":
     main()
