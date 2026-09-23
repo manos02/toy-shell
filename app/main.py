@@ -37,6 +37,9 @@ def main():
         elif command == "pwd":
             current_directory = os.getcwd()
             print(current_directory)
+        elif command.startswith("cd"):
+            path = command.split()[1]
+            os.chdir(path)
         else:
             print(f"{command}: command not found")
 
