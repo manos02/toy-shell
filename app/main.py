@@ -39,6 +39,14 @@ def main():
             print(current_directory)
         elif command.startswith("cd"):
             path = command.split()[1]
+            current_directory = os.getcwd()
+            # relative path
+            # if path[0] != "/":
+            path = os.path.join(current_directory, path[0])
+            print(path)
+
+
+
             try:
                 os.chdir(path)
             except FileNotFoundError:
