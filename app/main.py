@@ -2,6 +2,7 @@ import shutil
 import sys
 import os
 import subprocess
+import re
 
 def main():
     builtin_commands = ["type", "echo", "exit", "pwd"]
@@ -17,11 +18,8 @@ def main():
         if command == "exit":
             break
         elif command.startswith("echo"):
-            content_list = split_input_parts(command, index=1, range=True) # get everything after the "echo"
-            # TODO: implement custom parse
-            content_list = list(map(lambda x: x.strip("'"), content_list))
-            print("list", content_list)
-            content_str = " ".join(content_list)
+            content_str = command[5:] # get everything after the "echo"
+            content_str = parser(content_str) 
             print(content_str)
         elif command.startswith("type"):
             command_type = split_input_parts(command, index=1)
@@ -36,10 +34,8 @@ def main():
         elif command.startswith("custom_exe"):
             command_list = split_input_parts(command)
             program_name = command_list[0]
-            if path := is_executable(program_name, path_dirs):
-                out = subprocess.call(command_list)
-                if out != 0: # success return code, do not output
-                    print(out)
+            if is_executable(program_name, path_dirs):
+                subprocess.run(command_list)
                 continue
         elif command == "pwd":
             print(pwd())
@@ -53,8 +49,36 @@ def main():
                 os.chdir(path)
             except FileNotFoundError:
                 print(f"cd: {path}: No such file or directory")
+        elif command.startswith("cat"):
+            command = command[4:]
+            commands = command.split("'")
+            commands = [parser("'" + x + "'") for x in commands if x != ' ']
+            result = subprocess.run(["cat", *commands], capture_output=True, text=True)
+            print(result.stdout, end="")
         else:
             print(f"{command}: command not found")
+
+def remove_extra(inp):
+    return re.sub(' +', ' ', inp)
+
+def parser(inp:str):
+    opening = False
+    res = ""
+    temp = ""
+    for i in range(len(inp)):
+        if inp[i] != "'":
+            temp += inp[i]
+        else:
+            if not opening:
+                res += remove_extra(temp)
+                temp = ""
+                opening = True
+            else: 
+                res += temp
+                temp = ""
+                opening = False
+    res += remove_extra(temp)
+    return res
 
 def is_executable(command_type, path_dirs):
     for path in path_dirs:
