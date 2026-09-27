@@ -61,8 +61,7 @@ def parser(inp):
             temp += c
             has_content = True
             backlash_before = False
-            continue
-        if c == "'" and not double_opening: # single quotes
+        elif c == "'" and not double_opening: # single quotes
             single_opening = not single_opening
             has_content = True
         elif c == '"': # double quotes
