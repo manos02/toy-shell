@@ -48,18 +48,22 @@ def main():
                 subprocess.run(args)
             else:
                 print(f"{command}: command not found")
-def parser(inp:str):
-    opening = False
+def parser(inp):
+    single_opening = False
+    double_opening = False
     has_content = False
     result = []
     temp = ""
     for c in inp:
-        if c == "'":
-            opening = not opening
+        if c == "'" and not double_opening:
+            single_opening = not single_opening
             has_content = True
-        elif opening:
+        elif c == '"': # double quotes
+            double_opening = not double_opening
+            has_content = True
+        elif single_opening or double_opening:
             temp += c
-        elif c == " ":
+        elif c == " ": # check for space
             if temp or has_content:
                 result.append(temp)
                 temp = ""
