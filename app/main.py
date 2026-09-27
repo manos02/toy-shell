@@ -52,10 +52,17 @@ def parser(inp):
     single_opening = False
     double_opening = False
     has_content = False
+    # if the previous character was a backlash so we treat the next one as literal character
+    backlash_before = False 
     result = []
     temp = ""
     for c in inp:
-        if c == "'" and not double_opening:
+        if backlash_before:
+            temp += c
+            has_content = True
+            backlash_before = False
+            continue
+        if c == "'" and not double_opening: # single quotes
             single_opening = not single_opening
             has_content = True
         elif c == '"': # double quotes
@@ -63,6 +70,8 @@ def parser(inp):
             has_content = True
         elif single_opening or double_opening:
             temp += c
+        elif c == "\\":
+            backlash_before = True
         elif c == " ": # check for space
             if temp or has_content:
                 result.append(temp)
