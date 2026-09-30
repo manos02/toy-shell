@@ -46,7 +46,6 @@ def main():
         else:
             if is_executable(command, path_dirs):
                 res = subprocess.run(args, capture_output=True, text=True)
-                # print("RES", res)
                 if res.stderr:
                     print(res.stderr.rstrip("\n"))
                 if res.stdout:
