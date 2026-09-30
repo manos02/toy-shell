@@ -1,7 +1,7 @@
 import sys
 import os
 import subprocess
-from app.helpers import is_executable, parse, pwd
+from app.helpers import is_executable, parse, print_or_redirect, pwd
 
 def main():
     builtin_commands = ["type", "echo", "exit", "pwd", "cd"]
@@ -14,14 +14,15 @@ def main():
     while True:
         sys.stdout.write("$ ")
         line = input()
-        args = parse(line)
+        args, file_to_write = parse(line)
         if not args:
             continue
         command = args[0]
         if command == "exit":
             break
         elif command == "echo":
-            print(" ".join(args[1:]))
+            out = " ".join(args[1:])
+            print_or_redirect(out, file_to_write)
         elif command == "type":
             command_type = args[1]
             if command_type in builtin_commands:
@@ -44,7 +45,12 @@ def main():
                 print(f"cd: {path}: No such file or directory")
         else:
             if is_executable(command, path_dirs):
-                subprocess.run(args)
+                res = subprocess.run(args, capture_output=True, text=True)
+                # print("RES", res)
+                if res.stderr:
+                    print(res.stderr.rstrip("\n"))
+                if res.stdout:
+                    print_or_redirect(res.stdout, file_to_write)
             else:
                 print(f"{command}: command not found")
 
