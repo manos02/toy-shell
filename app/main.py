@@ -14,7 +14,7 @@ def main():
     while True:
         sys.stdout.write("$ ")
         line = input()
-        args, file_to_write = parse(line)
+        args, file_to_write, red_sderr = parse(line)
         if not args:
             continue
         command = args[0]
@@ -22,7 +22,7 @@ def main():
             break
         elif command == "echo":
             out = " ".join(args[1:])
-            print_or_redirect(out, file_to_write)
+            print_or_redirect(out, file=file_to_write, red_sderr=red_sderr)
         elif command == "type":
             command_type = args[1]
             if command_type in builtin_commands:
@@ -46,8 +46,8 @@ def main():
         else:
             if is_executable(command, path_dirs):
                 res = subprocess.run(args, capture_output=True, text=True)
-                print_or_redirect(res.stderr.rstrip("\n"))
-                print_or_redirect(res.stdout.rstrip("\n"), file_to_write)
+                print_or_redirect(res.stdout.rstrip("\n"), file_to_write, red_sderr=red_sderr)
+                print_or_redirect(res.stderr.rstrip("\n"), file_to_write, is_error=True, red_sderr=red_sderr)
             else:
                 print(f"{command}: command not found")
 

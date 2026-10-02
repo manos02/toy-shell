@@ -1,11 +1,13 @@
 import os
 import shutil
+from pathlib import Path
 
 def parse(user_input):
     redirect = False
     single_opening = False
     double_opening = False
     has_content = False
+    red_sderr = False
     input_len = len(user_input)
     result = []
     temp = ""
@@ -32,7 +34,9 @@ def parse(user_input):
                 has_content = False
         elif user_input[i] == ">":
             redirect=True
-            if i and user_input[i-1] == "1":
+            if i and user_input[i-1] in ["1", "2"]:
+                if user_input[i-1] == "2":
+                    red_sderr = True
                 temp = temp[:-1] # remove the last character
                 has_content = False
         else:
@@ -43,8 +47,8 @@ def parse(user_input):
         result.append(temp)
 
     if redirect:
-        return result[0:len(result)-1], result[-1]
-    return result, None 
+        return result[0:len(result)-1], result[-1], red_sderr
+    return result, None, False 
 
 def is_executable(command_type, path_dirs):
     for path in path_dirs:
@@ -55,14 +59,20 @@ def is_executable(command_type, path_dirs):
 def get_working_directory():
     return os.getcwd()
 
-def print_or_redirect(output, file=None):
+def print_or_redirect(output, file=None, is_error=False, red_sderr=False):
     if not output:
         return
-    if not file:
+    if red_sderr and not is_error:
+        path = Path(file)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
         print(output)
-        return
-    with open(file, "w") as f:
-        f.write(output)
+    # If there is no file passed or error and not 2>
+    elif not file or (is_error and not red_sderr):
+        print(output)
+    else: 
+        with open(file, "w") as f:
+            f.write(output)
 
 
 
