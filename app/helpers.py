@@ -52,15 +52,17 @@ def is_executable(command_type, path_dirs):
             return path
     return False
 
-def pwd():
+def get_working_directory():
     return os.getcwd()
 
-def print_or_redirect(output, file):
+def print_or_redirect(output, file=None):
+    if not output:
+        return
     if not file:
-        print(output.rstrip("\n"))
+        print(output)
         return
     with open(file, "w") as f:
-        f.write(output.rstrip("\n"))
+        f.write(output)
 
 
 

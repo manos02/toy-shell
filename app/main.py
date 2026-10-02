@@ -1,7 +1,7 @@
 import sys
 import os
 import subprocess
-from app.helpers import is_executable, parse, print_or_redirect, pwd
+from app.helpers import is_executable, parse, print_or_redirect, get_working_directory
 
 def main():
     builtin_commands = ["type", "echo", "exit", "pwd", "cd"]
@@ -32,13 +32,13 @@ def main():
             else:
                 print(f"{command_type} not found")
         elif command == "pwd":
-            print(pwd())
+            print(get_working_directory())
         elif command == "cd":
             path = args[1] if len(args) > 1 else "~"
             if path == "~": # handle home path
                 path = home_path
             else:
-                path = os.path.join(pwd(), path)
+                path = os.path.join(get_working_directory(), path)
             try:
                 os.chdir(path)
             except FileNotFoundError:
@@ -46,10 +46,8 @@ def main():
         else:
             if is_executable(command, path_dirs):
                 res = subprocess.run(args, capture_output=True, text=True)
-                if res.stderr:
-                    print(res.stderr.rstrip("\n"))
-                if res.stdout:
-                    print_or_redirect(res.stdout, file_to_write)
+                print_or_redirect(res.stderr.rstrip("\n"))
+                print_or_redirect(res.stdout.rstrip("\n"), file_to_write)
             else:
                 print(f"{command}: command not found")
 
